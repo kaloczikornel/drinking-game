@@ -1,4 +1,5 @@
 {
+    "extends": ["eslint:recommended", "next"],
     "rules": {
         "no-console": "off",
         "prettier/prettier": "error",
