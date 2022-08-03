@@ -1,5 +1,6 @@
 {
     "extends": ["eslint:recommended", "next", "eslint-config-prettier"],
+    "plugins": ["eslint-plugin-prettier"],
     "rules": {
         "no-console": "off",
         "prettier/prettier": "error",
