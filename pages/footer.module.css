@@ -1,0 +1,14 @@
+.footer {
+    position: fixed;
+    padding: 10px 10px 0 10px;
+    bottom: 0;
+    width: 100%;
+    /* Height of the footer*/
+    height: 40px;
+    background: #2C3333;
+    color: aliceblue;
+}
+
+.body{
+    background: #395B64;
+}

@@ -1,7 +1,18 @@
 import Head from 'next/head';
-import { Button, Card, Chip, Grid, Paper, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import {
+    Button,
+    Card,
+    Chip,
+    Grid,
+    MenuItem,
+    Paper,
+    Select,
+    TextField,
+    Typography,
+} from '@mui/material';
+import { useEffect, useState } from 'react';
 import Cancel from '@mui/icons-material/Cancel';
+import styles from './footer.module.css';
 
 const SENTENCES = [
     'What’s your most shallow reason for not 2. What’s the worst date you’ve ever had? ',
@@ -159,9 +170,176 @@ const SENTENCES = [
     'What’s the most embarrassing thing you’ve done drunk? ',
     'Have your parents ever walked in on you doing it?',
 ];
+const MONDATOK = [
+    'Soha nem tettem úgy, hogy beteg vagyok, hogy elkerüljem az iskolába járást.',
+    'Soha nem zaklattam soha egy osztálytársamat.',
+    'Soha engem soha nem választottak utoljára egy csoportos projektnél.',
+    'Soha nem dobtam soha iskolai kiránduláson.',
+    'Soha nem kacérkodtam a tanárommal.',
+    'Soha nem voltam prom.',
+    'Soha nem esküdtem meg egy osztálytársamra.',
+    'Soha nem loptam még soha egy osztálytársamtól.',
+    'Soha nem énekeltem a zuhany alatt.',
+    'Soha nem néztem még R kategóriájú filmet.',
+    'Még soha nem gyakoroltam, hogyan csókoljak meg a párnám segítségével.',
+    'Soha nem játszottam még soha Üvegezés.',
+    'Soha nem találkoztam még valakivel.',
+    'Soha nem játszottam még pókert.',
+    'Soha nem csevegtem még soha egy idegennel online.',
+    'Soha nem késtem még el az iskolából.',
+    'Soha nem vettem gatyába gyereket.',
+    'Soha nem fingtam soha egy osztálytársam előtt .',
+    'Soha nem volt részmunkaidős munkám.',
+    'Soha nem csaltam meg egy tesztet.',
+    'Soha nem rejtettem el ételt az ágyam alatt.',
+    'Soha nem buktam el és estem el egy összejövetel közepén.',
+    'Soha nem csináltam még buta arcokat szüleimmel és tanáraimmal.',
+    'Soha nem énekeltem még szerencsétlenül egy fürdőszobában.',
+    'Soha nem táncoltam még tükör előtt.',
+    'Soha nem húztam ki laza fogaimat, és nem mutattam meg másoknak.',
+    'Soha nem gondoltam volna, hogy milyen macskának lenni.',
+    'Soha nem estem még ki ágyból alvás közben.',
+    'Soha nem loptam még el titokban pénzt apám zsebéből.',
+    'Soha nem kölcsönöztem testvérem tollát kérés nélkül.',
+    'Soha nem rajzoltam még mindig vicces rajzfilmet testvérem arcára, miközben ők aludtak.',
+    'Soha nem hazudtam még szüleimnek arról, hogy a húgom hogyan húzta meg a hajam, amikor nem.',
+    'Soha nem ettem még valamit, amíg az nem betegített meg.',
+    'Soha nem voltam kórházban.',
+    'Soha nem tanultam még meg úszni.',
+    'Soha nem láttam még hulló csillagot.',
+    'Soha nem hordtam még véletlenül össze nem illő zoknit.',
+    'Soha nem volt még szörnyű frizurám.',
+    'Soha nem törtem el csontot.',
+    'Még soha nem mentem ki úgy, hogy ne hajaztam volna hajat.',
+    'Soha nem aludtam kint részegen.',
+    'Soha nem ittam whiskyt, mint a vizet.',
+    'Soha nem voltam részeg, felhívtam valakit.',
+    'Még soha nem mentem haza rossz házba ittas állapotban.',
+    'Soha nem sportoltam ivás közben.',
+    'Soha nem hibáztattam az ivást valamiért, amit mondtam.',
+    'Soha nem volt még terhességi félelmem.',
+    'Soha nem ittam még tömegközlekedéssel.',
+    'Soha nem hagytam ki az ivást.',
+    'Soha nem cseréltem ki soha az izzót egyedül.',
+    'Soha nem estem át italozás miatt.',
+    'Soha nem játszottam még ivó játékot.',
+    'Soha nem nyitottam még egy palackot másik palackkal.',
+    'Soha nem ittam egyedül.',
+    'Soha nem voltam részeg, hogy bizalmat szerezzek.',
+    'Soha nem ettem osztrigát.',
+    'Soha nem csaltam be egy sört kevesebb, mint 10 másodperc alatt, majd pukiztam.',
+    'Soha nem tettem még testlövést.',
+    'Soha nem voltam sovány mártogatós.',
+    'Soha nem szavaztam soha egy választáson.',
+    'Soha nem voltam még tehetséges ékszer.',
+    'Soha nem tettem házassági javaslatot.',
+    'Soha nem tápláltam valakit kanállal.',
+    'Még soha nem küldtem valakinek egy aranyos reggeli SMS-t.',
+    'Soha nem próbáltam még soha a gyorskeresést.',
+    'Soha nem kaptam még virágot valakitől, akivel randizom.',
+    'Soha nem töltöttem még egy éjszakát valakivel a tengerparton.',
+    'Soha nem voltam még hosszú úton olyan valakivel, akivel randizom.',
+    'Soha nem csináltam még színházban.',
+    'Soha nem vacsoráztam soha egy gyertyafényes romantikus vacsorán.',
+    'Soha nem próbáltam ellopni a partnerem jelszavát.',
+    'Soha nem zúztam össze barátom párját.',
+    'Soha nem követtem valakit az Instagramon.',
+    'Soha nem bántam meg, hogy valakivel randevúztam.',
+    'Soha nem próbáltam elrejteni egy hickey-t.',
+    'Soha nem beszéltem valakivel egész éjjel.',
+    'Soha nem voltam soha barátom körzetében.',
+    'Soha nem szakítottam valakit szöveggel.',
+    'Soha nem csókoltam még valakit egy liftben.',
+    'Soha nem küldtem valakinek szexi szelfit.',
+    'Soha nem szedtem még az orrom.',
+    'Soha nem törtem el soha a mobiltelefonomat.',
+    'Soha nem léptem be valakihez a fürdőszobában.',
+    'Még soha nem kaptam el, hogy a tükör előtt egyedülálló táncmulatságot tartottam.',
+    'Soha nem tettem soha péksüteményeket a zsebembe szalvéta vagy takaró nélkül, miközben részeg voltam, mert később át akartam adni a testvéremnek.',
+    'Soha nem hagytam részeg hangpostát.',
+    'Soha nem küldtem még soha véletlenül rossz embernek szöveget.',
+    'Még soha nem ütöttem falat és nem bántam meg, mert fájdalmas volt.',
+    'Soha nem ettem még véletlenül kutyaeledelt.',
+    'Soha nem villantottam valakit.',
+    'Soha nem büszkélkedtem büszkén az ábécével.',
+    'Soha nem nevettem még soha annyira, hogy bepisiltem magam.',
+    'Soha nem választottam még soha nyilvános házasságot.',
+    'Soha nem öltöztem valaha ellenkező nemnek.',
+    'Soha nem állítottam be soha a gombjaimat a teremben tartózkodók alapján.',
+    'Soha nem fingtam valakivel, aki tetszett.',
+    'Soha nem ugrottam medencébe ruhával.',
+    'Soha nem próbáltam még a holdfényt.',
+    'Soha nem próbáltam lenyűgözni egy összetörést azzal, hogy látszott hozzáértőnek.',
+    'Soha nem küldtem piszkos szöveget rossz embernek.',
+    'Még soha nem repültem első osztályban.',
+    'Soha nem tettem valakinek WC-vel papírokat Halloween idején.',
+    'Még soha nem hajtottam botváltást.',
+    'Soha nem használtam hamis személyi igazolványt.',
+    'Soha nem voltam még cél esküvőn.',
+    'Soha nem hagytam ki az ötösöt.',
+    'Soha nem szereztem még ajándékot.',
+    'Még soha nem mentem 24 órát zuhanyozás nélkül.',
+    'Még soha nem küldtem vissza az ételt egy étterembe.',
+    'Még soha nem mentettem meg valaki más életét.',
+    'Még soha nem hazudtam a legjobb barátomnak arról, hogy kivel voltam.',
+    'Soha nem voltam Disneyland-ben.',
+    'Soha nem tettem úgy, hogy ismerek egy idegent, mert úgy éreztem, hogy valaki követ engem.',
+    'Soha nem szerettem valamit, amit főztem.',
+    'Soha nem volt pánikrohamom.',
+    'Még soha nem kóstoltam kaviárt.',
+    'Soha nem használtam még valaki más Netflix jelszavát.',
+    'Még soha nem aludtam el az osztályban.',
+    'Soha nem bocsátottak el soha.',
+    'Soha nem néztem meg egy teljes televíziós sorozatot egy nap alatt.',
+    'Soha nem csókoltam egynél több embert 24 óra alatt.',
+    'Soha nem volt egyéjszakás állásom és reggeliztem.',
+    'Még soha nem kellett volna szégyent járnom.',
+    'Még soha nem táncoltam bárban.',
+    'Még soha nem rúgtak ki egy kocsmából / klubból / bárból.',
+    'Még soha nem léptem be a mérföldes klubba egy idegennel.',
+    'Még soha nem aludtam el szex közben.',
+    'Soha nem játszottam még szerepet ágyban.',
+    'Soha nem jártam sztriptíz klubba.',
+    'Soha nem tettem még konyhapulton.',
+    'Soha nem feküdtem le azonos ikrekkel.',
+    'Soha nem feküdtem le egy barátom partnerével.',
+    'Soha nem nyeltem le a legelső szopást.',
+    'Soha nem hazudtam valakinek a "számomról", akivel randizom.',
+    'Soha nem voltam bilincsben.',
+    'Soha nem hazudtam még egy csaló barát védelmében.',
+    'Soha nem ébredtem rá, hogy valaki fejet ad nekem.',
+    'Soha nem hajtottam végre „őrült ruhakeresést”, amikor valaki bekopogott az ajtón.',
+    'Még soha nem csináltam barátom bátyjával.',
+    'Soha nem készítettem még meztelen képet barátomról.',
+    'Soha nem lettem még annyira másnapos, hogy megesküdtem, hogy soha többet nem iszom.',
+    'Soha nem csókoltam valakit a nyilvánosság előtt.',
+    'Soha nem volt még szerelmem veszekedése a nyilvánosság előtt.',
+    'Soha nem hagytam ki az éttermi számlát.',
+    'Soha nem nyertem a lottón.',
+    'Soha nem kellett bírósághoz fordulnom.',
+    'Soha nem estem össze esküvőt.',
+    'Soha nem trolloltam valakit a közösségi médiában.',
+    'Soha nem másztam ki az ablakon.',
+    'Soha nem nevettem még soha annyira, hogy bepisiltem a nadrágomat.',
+    'Soha nem próbáltam még dohányozni a marihuánával.',
+    'Soha nem csináltam még tetoválást.',
+    'Soha nem alkottam valaha hamis barátot / barátnőt.',
+    'Soha nem tettem úgy, mintha beteg lennék, hogy az emberek odafigyeljenek rám.',
+    'Soha nem költöttem 100 dollárnál többet pénztárcára.',
+    'Soha nem dobtam valakinek egy italt.',
+    'Soha nem hordtam még valaki más fehérneműt.',
+    'Soha nem próbáltam még búvárkodni.',
+    'Soha nem tartóztattak le soha, mert csatlakoztam egy tiltakozáshoz.',
+    'Soha nem hagytam még megállás nélkül huszonnégy óránál tovább.',
+];
 
-const randomGenerator = () => {
-    return Math.round(Math.random() * SENTENCES.length);
+const GAME_TYPES = {
+    DEFAULT: 'Alap',
+    NEVER_HAVE_I_EVER: 'Én még soha...',
+};
+
+const randomGenerator = (base) => {
+    return Math.round(Math.random() * base.length);
 };
 
 export default function Home() {
@@ -171,9 +349,11 @@ export default function Home() {
     const [players, setPlayers] = useState([]);
     const [actualPLayer, setActualPlayer] = useState(false);
     const [error, setError] = useState(false);
+    const [gameData, setGameData] = useState(SENTENCES);
+    const [typeOfGame, setTypeOfGame] = useState(GAME_TYPES.DEFAULT);
 
     const handleClick = () => {
-        setQNumber(randomGenerator());
+        setQNumber(randomGenerator(gameData));
         setActualPlayer((prevState) => {
             if (!actualPLayer) {
                 return players[0];
@@ -199,8 +379,23 @@ export default function Home() {
             }, 3000);
         }
     };
+
+    useEffect(() => {
+        switch (typeOfGame) {
+            case GAME_TYPES.DEFAULT:
+                setGameData(SENTENCES);
+                break;
+            case GAME_TYPES.NEVER_HAVE_I_EVER:
+                setGameData(MONDATOK);
+                break;
+            default:
+                setGameData(SENTENCES);
+                break;
+        }
+    }, [typeOfGame, setGameData]);
+    console.log(typeOfGame);
     return (
-        <div className="container">
+        <>
             <Head>
                 <title>Drinking Game by Kornél</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -215,6 +410,7 @@ export default function Home() {
                         margin: 'auto',
                         padding: 8,
                         marginTop: 10,
+                        background: '#A5C9CA',
                     }}
                 >
                     <Grid
@@ -227,6 +423,22 @@ export default function Home() {
                         {!isGameOn && (
                             <>
                                 <Grid item xs={12}>
+                                    <TextField
+                                        value={typeOfGame}
+                                        label="Típus"
+                                        onChange={(e) => setTypeOfGame(e.target.value)}
+                                        select
+                                    >
+                                        {Object.keys(GAME_TYPES).map((e) => {
+                                            return (
+                                                <MenuItem key={e} value={GAME_TYPES[e]}>
+                                                    {GAME_TYPES[e]}
+                                                </MenuItem>
+                                            );
+                                        })}
+                                    </TextField>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <Typography variant="h5">Adj hozzá játékosokat!</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -238,6 +450,7 @@ export default function Home() {
                                         onChange={(e) => setPlayerName(e.target.value)}
                                         onFocus={(e) => {
                                             e.target.value = '';
+                                            setPlayerName('');
                                         }}
                                     ></TextField>
                                 </Grid>
@@ -249,7 +462,12 @@ export default function Home() {
                                     </Grid>
                                 )}
                                 <Grid item xs={12}>
-                                    <Button onClick={() => addPlayer(playerName)}>Hozzáad</Button>
+                                    <Button
+                                        disabled={playerName === ''}
+                                        onClick={() => addPlayer(playerName)}
+                                    >
+                                        Hozzáad
+                                    </Button>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Grid
@@ -268,7 +486,7 @@ export default function Home() {
                                                     sx={{
                                                         display: 'flex',
                                                         flexWrap: 'wrap',
-                                                        margin: 2,
+                                                        margin: 3,
                                                     }}
                                                     justifyContent={'center'}
                                                 >
@@ -313,8 +531,12 @@ export default function Home() {
                                 }}
                             >
                                 <Grid item xs={12}>
-                                    <Card sx={{ padding: 2 }}>
-                                        <Typography variant="h4" margin={'auto'}>
+                                    <Card sx={{ padding: 2, background: '#2C3333' }}>
+                                        <Typography
+                                            variant="h4"
+                                            margin={'auto'}
+                                            color={'whitesmoke'}
+                                        >
                                             Ivós játék haha
                                         </Typography>
                                     </Card>
@@ -322,7 +544,7 @@ export default function Home() {
                                         {`Te következel: ${actualPLayer}`}
                                     </Typography>
                                     <Typography variant="h6" marginTop={10}>
-                                        {SENTENCES[qNumber]}
+                                        {gameData[qNumber]}
                                     </Typography>
                                 </Grid>
                                 <Grid item xs={12} marginTop={10}>
@@ -341,9 +563,9 @@ export default function Home() {
                     </Grid>
                 </Paper>
             </main>
-            <footer>
+            <footer className={styles.footer}>
                 <a>Powered by ÉN</a>
             </footer>
-        </div>
+        </>
     );
 }
