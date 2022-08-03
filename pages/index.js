@@ -1,8 +1,7 @@
 import Head from 'next/head';
-import Link from 'next/link';
-import { Button, Grid, Input, Paper, TextField, Typography } from '@mui/material';
+import { Button, Card, Chip, Grid, Input, Paper, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
-import { loadGetInitialProps } from 'next/dist/shared/lib/utils';
+import Cancel from '@mui/icons-material/Cancel';
 
 const SENTENCES = [
     'What’s your most shallow reason for not 2. What’s the worst date you’ve ever had? ',
@@ -166,12 +165,39 @@ const randomGenerator = () => {
 };
 
 export default function Home() {
-    const [playerCount, setPlayerCount] = useState(1);
+    const [playerName, setPlayerName] = useState('');
     const [isGameOn, setIsGameOn] = useState(false);
     const [qNumber, setQNumber] = useState(0);
+    const [players, setPlayers] = useState([]);
+    const [actualPLayer, setActualPlayer] = useState(false);
+    const [error, setError] = useState(false);
 
     const handleClick = () => {
         setQNumber(randomGenerator());
+        setActualPlayer((prevState) => {
+            if (!actualPLayer) {
+                return players[0];
+            } else {
+                let index = players.findIndex((e) => e === actualPLayer);
+                if (index < players.length - 1) {
+                    index++;
+                } else {
+                    index = 0;
+                }
+                return players[index];
+            }
+        });
+    };
+
+    const addPlayer = (name) => {
+        if (!players.includes(name)) {
+            setPlayers((prevState) => [...prevState, name]);
+        } else {
+            setError('Egyedi név szükséges!');
+            setTimeout(() => {
+                setError(false);
+            }, 3000);
+        }
     };
     return (
         <div className="container">
@@ -181,10 +207,19 @@ export default function Home() {
             </Head>
 
             <main>
-                <Paper elevation={8} sx={{ height: 600, width: 400, margin: 'auto', padding: 10 }}>
+                <Paper
+                    elevation={8}
+                    sx={{
+                        maxHeight: 900,
+                        maxWidth: 600,
+                        margin: 'auto',
+                        padding: 8,
+                        marginTop: 10,
+                    }}
+                >
                     <Grid
                         container
-                        spacing={5}
+                        spacing={3}
                         direction={'column'}
                         alignItems={'center'}
                         justifyContent={'center'}
@@ -192,21 +227,81 @@ export default function Home() {
                         {!isGameOn && (
                             <>
                                 <Grid item xs={12}>
-                                    <Typography variant="h3">
-                                        Hány emberrel szeretnél játszni?
-                                    </Typography>
+                                    <Typography variant="h5">Adj hozzá játékosokat!</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <TextField
-                                        label="Játékos szám"
-                                        type="number"
+                                        label="Játékos neve"
+                                        type="text"
                                         color="primary"
                                         focused
-                                        onChange={(e) => setPlayerCount(e.target.value)}
+                                        onChange={(e) => setPlayerName(e.target.value)}
+                                        onFocus={(e) => {
+                                            e.target.value = '';
+                                        }}
                                     ></TextField>
                                 </Grid>
+                                {error && (
+                                    <Grid item xs={12}>
+                                        <Typography variant={'subtitle2'} color={'red'}>
+                                            {error}
+                                        </Typography>
+                                    </Grid>
+                                )}
                                 <Grid item xs={12}>
-                                    <Button onClick={() => setIsGameOn(true)}>JÁTÉK</Button>
+                                    <Button onClick={() => addPlayer(playerName)}>Hozzáad</Button>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Grid
+                                        container
+                                        spacing={2}
+                                        direction={'row'}
+                                        alignItems={'center'}
+                                        justifyContent={'center'}
+                                    >
+                                        {players.map((player) => {
+                                            return (
+                                                <Grid
+                                                    item
+                                                    xs={2}
+                                                    key={player}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        flexWrap: 'wrap',
+                                                        margin: 2,
+                                                    }}
+                                                    justifyContent={'center'}
+                                                >
+                                                    <Typography varianx t="subheading">
+                                                        <Chip
+                                                            label={player}
+                                                            onDelete={(e) => {
+                                                                e.preventDefault();
+                                                                setPlayers((prevState) =>
+                                                                    prevState.filter(
+                                                                        (e) => e !== player
+                                                                    )
+                                                                );
+                                                            }}
+                                                            deleteIcon={<Cancel />}
+                                                        />
+                                                    </Typography>
+                                                </Grid>
+                                            );
+                                        })}
+                                    </Grid>
+                                </Grid>
+
+                                <Grid item xs={12}>
+                                    <Button
+                                        disabled={!(players.length > 0)}
+                                        onClick={() => {
+                                            setIsGameOn(true);
+                                            setActualPlayer(players[0]);
+                                        }}
+                                    >
+                                        JÁTÉK
+                                    </Button>
                                 </Grid>
                             </>
                         )}
@@ -217,17 +312,30 @@ export default function Home() {
                                     handleClick();
                                 }}
                             >
-                                <Typography variant="h5" marginTop={35}>
-                                    {SENTENCES[qNumber]}
-                                </Typography>
-                                <Button
-                                    onClick={() => {
-                                        setIsGameOn(false);
-                                        setPlayerCount(0);
-                                    }}
-                                >
-                                    Előről
-                                </Button>
+                                <Grid item xs={12}>
+                                    <Card sx={{ padding: 2 }}>
+                                        <Typography variant="h4" margin={'auto'}>
+                                            Ivós játék haha
+                                        </Typography>
+                                    </Card>
+                                    <Typography variant="h6" marginTop={5}>
+                                        {`Te következel: ${actualPLayer}`}
+                                    </Typography>
+                                    <Typography variant="h6" marginTop={10}>
+                                        {SENTENCES[qNumber]}
+                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12} marginTop={10}>
+                                    <Button
+                                        onClick={() => {
+                                            setIsGameOn(false);
+                                            setPlayerName('');
+                                        }}
+                                        fullWidth
+                                    >
+                                        Előről
+                                    </Button>
+                                </Grid>
                             </div>
                         )}
                     </Grid>
