@@ -1,15 +1,5 @@
 import Head from 'next/head';
-import {
-    Button,
-    Card,
-    Chip,
-    Grid,
-    MenuItem,
-    Paper,
-    Select,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { Button, Card, Chip, Grid, MenuItem, Paper, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Cancel from '@mui/icons-material/Cancel';
 import styles from './footer.module.css';

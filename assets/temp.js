@@ -165,4 +165,4 @@ A.forEach((e) => {
     B.push(e.slice(4));
 });
 
-console.dir(B, {'maxArrayLength': null});
+console.dir(B, { maxArrayLength: null });
